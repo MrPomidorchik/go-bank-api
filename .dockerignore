@@ -1,0 +1,16 @@
+.git
+.idea
+.vscode
+
+.env
+.env.local
+.env.docker
+
+tmp
+temp
+logs
+*.log
+
+*.exe
+*.test
+*.out

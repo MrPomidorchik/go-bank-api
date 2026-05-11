@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:18
+    container_name: bank-api-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bank_api
+    ports:
+      - "5433:5432"
+    volumes:
+      - bank_api_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bank_api"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  migrator:
+    image: postgres:18
+    container_name: bank-api-migrator
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: postgres
+    volumes:
+      - ./migrations:/migrations:ro
+    command: >
+      sh -c '
+        echo "Running migrations...";
+        for file in /migrations/*.sql; do
+          echo "Applying $$file";
+          psql -h db -U postgres -d bank_api -f "$$file";
+        done;
+        echo "Migrations completed.";
+      '
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bank-api-app
+    env_file:
+      - .env.docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  bank_api_postgres_data:
