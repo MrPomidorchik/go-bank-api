@@ -1,0 +1,35 @@
+# Go
+/bin/
+/build/
+/dist/
+*.exe
+*.test
+*.out
+
+# Go workspace
+go.work
+
+# Env files
+.env
+.env.local
+.env.*.local
+.env.docker
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database dumps
+*.sql.backup
+*.dump
+
+# Temporary files
+tmp/
+temp/
